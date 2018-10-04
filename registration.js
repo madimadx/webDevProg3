@@ -25,23 +25,28 @@ let usernameCheck = (username) => {
 		username = document.getElementById("username").value;
 	}
 
+	let check = function(status) {
+		if (status == 404 || status == 200) return true;
+		else return false;
+	}
+
 	//const axios = require('axios');	
 	//define our response handler
-	let handler = (response) => {
+	//let handler = (response) => { 
 	//make a GET request to users/<username>,
 	//accept a valid status of 200 or 404, anything else will throw a console error
 	//we are not registering an error handler so errors should bubble up to top of app
-	axois.get('users/username')
+	axios.get('users/' +username, {validateStatus:check},username)
 		.then(function(response) {
 			if (response.status == 200) setUsernameStatus (true);
-			else if (response.status == 404) setUsernameStatuss (false);
+			else if (response.status == 404) setUsernameStatus (false);
 			console.log(response.status);
 		})
 		.catch(function(error) {
 			console.log("username get error "+error);
 			showError(error);
 		});								
-	}
+	//}
 };
 
 let strengthCheck = (password) => {
@@ -91,7 +96,6 @@ let showError = (error) => {
 //passing a test returns true, failing a test returns a message
 let minLength = (length, message) => 
 	(value) => value.length > length ? true : message; 
-//TODO: maxLength
 let maxLength = (length, message) =>
 	(value) => value.length < length ? true : message;
 let regex = (regex,message) => 
@@ -99,12 +103,10 @@ let regex = (regex,message) =>
 
 let strength = (strength,message) => 
 	(value) => strengthCheck(value) >= strength ? true : message;
-//TODO: confirmed (check password against confirm_password)
-let confirmed = (message) => {
-	let password = document.getElementById("password").value;
-	let confirm_password = document.getElementById("confirm_password").value;
-	(value) => password == confirm_password ? true : message;
-}; 
+let confirmed = (message) => 
+	(value) => document.getElementById("password").value
+		== document.getElementById("confirm_password").value
+		? true : message;
 let available = (message) => 
 	() => !usernameExists ? true : message;
 
@@ -138,15 +140,14 @@ let validation = {
 //stop testing and return the error message that the test returned
 let validate = (id) => {
 	
-	for (let i = 0; i < validation[id].size; i++) {
+	for (let i = 0; i < validation[id].length; i++) {
 		let val = document.getElementById(id).value;
 		console.log(val);
-		let out = (validation[id][i])(val);
-		if (out !== true) {
-			return out;
-		}
+		let out = validation[id][i](val);
+		if (out !== true) return out;
 	}
-	return true;
+	
+	return true;	
 }
 
 let submitForm = function(e){

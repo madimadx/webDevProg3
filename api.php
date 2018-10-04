@@ -135,6 +135,8 @@ $app->post('/auth',function(Request $request, Response $response, array $args) {
 	if ($authResult == 1) {
 		$_SESSION["username"] = $_POST['username'];
 		$_SESSION["password"] = $_POST['password'];
+		$name = getUser($_POST['username']);
+		$_SESSION["name"] = $name['name'];
 		echo 'Hi, ' . $_SESSION["username"] . ' ' . $_SESSION["password"];
 		return $response->withRedirect('index.php', 302);
 	}
